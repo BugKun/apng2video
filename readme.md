@@ -27,3 +27,7 @@ async function main() {
 
 main()
 ```
+
+## 兼容性
+
+ffmpeg < 5.1

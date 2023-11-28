@@ -43,7 +43,7 @@ async function converter(inputBuffer, ffmpegFormat, options = {}) {
     let result
     if(isVfr) {
         fs.writeFileSync(inputFilePath, inputText, 'utf-8')
-        result = spawnSync(ffmpegPath, ['-vsync', `vfr`, '-y', '-safe', 0, '-f', 'concat', '-i', inputFilePath, '-c:v', ...ffmpegFormat.command, outputPath])
+        result = spawnSync(ffmpegPath, ['-vsync', `passthrough`, '-y', '-safe', 0, '-f', 'concat', '-i', inputFilePath, '-c:v', ...ffmpegFormat.command, outputPath])
     } else {
         result = spawnSync(ffmpegPath, ['-framerate', `1000/${firstFrame.delay}`, '-y', '-i', path.join(tempFilePath, `%d.png`), '-c:v', ...ffmpegFormat.command, outputPath])
     }
