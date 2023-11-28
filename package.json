@@ -1,0 +1,30 @@
+{
+  "name": "anpg2video",
+  "version": "1.0.0",
+  "description": "anpg2video is a tool for convert Animated PNG to Video",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BugKun/anpg2video.git"
+  },
+  "author": "BugKun",
+  "license": "GPL-3",
+  "bugs": {
+    "url": "https://github.com/BugKun/anpg2video/issues"
+  },
+  "homepage": "https://github.com/BugKun/anpg2video",
+  "main": "index.js",
+  "scripts": {
+    "test": "cd example && node test"
+  },
+  "keywords": [
+    "anpg",
+    "video",
+    "converter",
+    "lossless"
+  ],
+  "dependencies": {
+    "apng-js": "^1.1.1",
+    "canvas": "^2.11.2",
+    "rimraf": "^5.0.5"
+  }
+}

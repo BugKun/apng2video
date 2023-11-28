@@ -1,0 +1,5 @@
+.git
+example/ffmpeg.exe
+example/test.webm
+node_modules
+.gitignore
