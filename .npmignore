@@ -1,5 +1,6 @@
 .git
 example/ffmpeg.exe
 example/test.webm
-node_modules
+node_modules/
 .gitignore
+package-lock.json
