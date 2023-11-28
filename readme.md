@@ -3,7 +3,7 @@
 
 ## 安装依赖
 ```bash
-npm i -s anpg2video
+npm i -s apng2video
 ```
 ### canvas 因网络问题安装失败的解决办法
 ```bash
