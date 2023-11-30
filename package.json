@@ -1,6 +1,6 @@
 {
   "name": "apng2video",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "apng2video is a tool for convert Animated PNG to Video",
   "repository": {
     "type": "git",

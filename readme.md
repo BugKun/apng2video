@@ -22,7 +22,7 @@ async function main() {
     const video = await apng2video(
         chip, // 文件buffer
         { command: ['libvpx-vp9', '-lossless', 1], extname: 'webm' }, // command 为 ffmpeg 末尾定义需要转换的格式；extname是文件的扩展名
-        { ffmpegPath: 'ffmpeg.exe', tempPath: './temp' } // ffmpeg 如果配置了全局变量了，则可以不配置路径；tempPath 可以不配置
+        { ffmpegPath: 'ffmpeg', ffprobePath: 'ffprobe', tempPath: './temp', skipInfo: false } // ffmpeg 和 ffprobe 如果配置了全局变量了，则可以不配置路径；tempPath 可以不配置；skipInfo 是否跳过更多信息检测
     )
     fs.writeFileSync('./test.webm', video.file)
 }
@@ -32,5 +32,5 @@ main()
 
 ## 兼容性
 
-nodejs >= 18
-ffmpeg < 5.1
+* nodejs >= 18
+* ffmpeg < 5.1
