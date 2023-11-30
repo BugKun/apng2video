@@ -8,7 +8,7 @@ const parseAPNG = require('apng-js').default
 const { spawnSync } = require('child_process')
 
 async function converter(inputBuffer, ffmpegFormat, options = {}) {
-    const { tempPath = os.tmpdir(), ffmpegPath = 'ffmpeg' } = options
+    const { tempPath = os.tmpdir(), ffmpegPath = 'ffmpeg', ffprobePath = 'ffprobe', skipInfo } = options
     const apng = parseAPNG(inputBuffer);
     if (apng instanceof Error) {
         throw apng
@@ -51,15 +51,29 @@ async function converter(inputBuffer, ffmpegFormat, options = {}) {
         throw new Error(result.stderr.toString())
     }
     const outputBuffer = fs.readFileSync(outputPath)
-    rimrafSync(tempFilePath, { preserveRoot: false })
-    return {
+    let data = {
         file: outputBuffer,
-        width: apng.width,
-        height: apng.height,
-        duration: apng.playTime,
-        frames: apng.frames.length,
-        vfr: isVfr,
     }
+    if(!skipInfo) {
+        const ffprobeDuration = spawnSync(ffprobePath, ['-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', '-i', outputPath])
+        const ffprobeFrames = spawnSync(ffprobePath, ['-v', 'error', '-count_frames', '-select_streams', 'v:0', '-show_entries', 'stream=nb_read_frames', '-of', 'default=noprint_wrappers=1:nokey=1', '-i', outputPath])
+        data = {
+            ...data,
+            apng: {
+                width: apng.width,
+                height: apng.height,
+                duration: apng.playTime,
+                frames: apng.frames.length,
+            },
+            video: {
+                duration: ffprobeDuration.status === 0 ? Number(ffprobeDuration.stdout.toString().replace('/r/n', '')) * 1000 : null,
+                frames: ffprobeFrames.status === 0 ? Number(ffprobeFrames.stdout.toString().replace('/r/n', '')) : null,
+                vfr: isVfr,
+            }
+        }
+    }
+    rimrafSync(tempFilePath, { preserveRoot: false })
+    return data
 }
 
 module.exports = converter

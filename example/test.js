@@ -6,7 +6,7 @@ async function main() {
     const video = await apng2video(
         chip,
         { command: ['libvpx-vp9', '-lossless', 1], extname: 'webm' },
-        // { ffmpegPath: 'ffmpeg', tempPath: './temp' }
+        // { ffmpegPath: 'ffmpeg', ffprobePath: 'ffprobe', tempPath: './temp', skipInfo: false }
     )
     console.log(video)
     fs.writeFileSync('./test.webm', video.file)

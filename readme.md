@@ -6,8 +6,10 @@
 npm i -s apng2video
 ```
 ### canvas 因网络问题安装失败的解决办法
+在项目根目录新建文件`.npmrc`，内容如下：
 ```bash
-npm install canvas --canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas
+registry=https://registry.npmmirror.com
+canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas
 ```
 
 ## 使用
@@ -30,4 +32,5 @@ main()
 
 ## 兼容性
 
+nodejs >= 18
 ffmpeg < 5.1
