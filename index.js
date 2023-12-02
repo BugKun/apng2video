@@ -26,18 +26,32 @@ async function converter(inputBuffer, ffmpegFormat, options = {}) {
     fs.mkdirSync(tempFilePath)
     let inputText = ''
     const inputFilePath = path.join(tempFilePath, `input.txt`)
+    const canvas = createCanvas(apng.width, apng.height)
+    const ctx = canvas.getContext('2d')
+    let prevFrame
+    let prevFrameData
     for (const index in apng.frames) {
         const item = apng.frames[index]
-        let imgBuffer = Buffer.from(await item.imageData.arrayBuffer())
-        if(apng.width !== item.width || apng.height != item.height || item.top !== 0 || item.left !== 0) {
-            const canvas = createCanvas(apng.width, apng.height)
-            const ctx = canvas.getContext('2d')
-            const image = await loadImage(imgBuffer)
-            ctx.drawImage(image, item.left, item.top)
-            imgBuffer = canvas.toBuffer()
+        if (prevFrame && prevFrame.disposeOp == 1) {
+            ctx.clearRect(prevFrame.left, prevFrame.top, prevFrame.width, prevFrame.height);
+        } else if (prevFrame && prevFrame.disposeOp == 2) {
+            ctx.putImageData(prevFrameData, prevFrame.left, prevFrame.top);
         }
-        fs.writeFileSync(path.join(tempFilePath, `${index}.png`), imgBuffer)
-        inputText += `file '${path.resolve(tempFilePath, index)}.png'\nduration ${item.delay}ms\n`
+        prevFrame = item;
+        prevFrameData = null;
+        if (item.disposeOp == 2) {
+            prevFrameData = ctx.getImageData(item.left, item.top, item.width, item.height);
+        }
+        if(item.blendOp === 0) {
+            ctx.clearRect(item.left, item.top, item.width, item.height)
+        }
+        let imgBuffer = Buffer.from(await item.imageData.arrayBuffer())
+        const image = await loadImage(imgBuffer)
+        ctx.drawImage(image, item.left, item.top)
+        imgBuffer = canvas.toBuffer()
+        const tempImgPath = path.join(tempFilePath, `${index}.png`)
+        fs.writeFileSync(tempImgPath, imgBuffer)
+        inputText += `file '${tempImgPath}'\nduration ${item.delay}ms\n`
     }
     const outputPath = path.join(tempFilePath, `video.${ffmpegFormat.extname}`)
     let result
@@ -72,7 +86,7 @@ async function converter(inputBuffer, ffmpegFormat, options = {}) {
             }
         }
     }
-    rimrafSync(tempFilePath, { preserveRoot: false })
+    // rimrafSync(tempFilePath, { preserveRoot: false })
     return data
 }
 
