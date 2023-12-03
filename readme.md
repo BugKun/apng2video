@@ -33,4 +33,3 @@ main()
 ## 兼容性
 
 * nodejs >= 18
-* ffmpeg < 5.1
