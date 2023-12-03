@@ -49,15 +49,19 @@ async function converter(inputBuffer, ffmpegFormat, options = {}) {
         const image = await loadImage(imgBuffer)
         ctx.drawImage(image, item.left, item.top)
         imgBuffer = canvas.toBuffer()
-        const tempImgPath = path.join(tempFilePath, `${index}.png`)
+        const tempImgPath = path.resolve(tempFilePath, `${index}.png`)
         fs.writeFileSync(tempImgPath, imgBuffer)
         inputText += `file '${tempImgPath}'\nduration ${item.delay}ms\n`
+        // ffmpeg concat last image duration incorrect fixed
+        if(isVfr && index == apng.frames.length - 1) {
+            inputText += `file '${tempImgPath}'\n`
+        }
     }
     const outputPath = path.join(tempFilePath, `video.${ffmpegFormat.extname}`)
     let result
     if(isVfr) {
         fs.writeFileSync(inputFilePath, inputText, 'utf-8')
-        result = spawnSync(ffmpegPath, ['-vsync', `passthrough`, '-y', '-safe', 0, '-f', 'concat', '-i', inputFilePath, '-c:v', ...ffmpegFormat.command, outputPath])
+        result = spawnSync(ffmpegPath, ['-vsync', 'passthrough', '-y', '-safe', 0, '-f', 'concat', '-i', inputFilePath, '-c:v', ...ffmpegFormat.command, outputPath])
     } else {
         result = spawnSync(ffmpegPath, ['-framerate', `1000/${firstFrame.delay}`, '-y', '-i', path.join(tempFilePath, `%d.png`), '-c:v', ...ffmpegFormat.command, outputPath])
     }
@@ -86,7 +90,7 @@ async function converter(inputBuffer, ffmpegFormat, options = {}) {
             }
         }
     }
-    // rimrafSync(tempFilePath, { preserveRoot: false })
+    rimrafSync(tempFilePath, { preserveRoot: false })
     return data
 }
 
